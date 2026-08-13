@@ -1,0 +1,10 @@
+{
+  "name": "FrogSkill",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/lllei/FrogSkill",
+  "description": "Give every Scout a frog tongue that can hook and pull Scouts and Zombies.",
+  "dependencies": [
+    "BepInEx-BepInExPack_PEAK-5.4.2403",
+    "PEAKModding-ModConfig-1.6.0"
+  ]
+}

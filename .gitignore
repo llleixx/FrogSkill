@@ -1,0 +1,21 @@
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+coverage/
+*.trx
+
+# Local tools and IDE state
+.tools/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Local PEAK installation path
+PeakGameDir.props
+
+# OS-generated files
+.DS_Store
+Thumbs.db
