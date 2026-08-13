@@ -2,6 +2,8 @@
 
 [English](#english) | [中文](#中文)
 
+![FrogSkill gameplay demo](https://raw.githubusercontent.com/llleixx/FrogSkill/main/docs/media/frog-skill-demo.gif)
+
 ## English
 
 FrogSkill gives every living Scout a frog tongue that can hook and pull other Scouts and Zombies.
