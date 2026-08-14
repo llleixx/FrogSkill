@@ -17,6 +17,7 @@ internal sealed class TongueModeController : MonoBehaviour
     private Character _caster = null!;
     private TongueMode _mode;
     private float _nextFireTime;
+    private bool _refirePending;
     private TextMeshProUGUI? _modeLabel;
     private Material? _modeLabelMaterial;
     private CanvasGroup? _modeLabelGroup;
@@ -44,30 +45,44 @@ internal sealed class TongueModeController : MonoBehaviour
         if (switchPressed)
             SwitchMode();
 
-        // Fire/release wins if both actions are configured to the same key.
-        if (!actionPressed)
+        // Re-grabbing is a new skill use. During cooldown, the current action is
+        // left untouched. Vanilla cleanup is asynchronous, so queue its replacement.
+        if (actionPressed && Time.time < _nextFireTime)
             return;
 
-        if (_customTongue.CanRelease)
+        if (actionPressed && _customTongue.CanRelease)
         {
             _customTongue.Release();
-            return;
+            _refirePending = true;
         }
-
-        if (_vanillaTongue.CanRelease)
+        else if (actionPressed && _vanillaTongue.CanRelease)
         {
             _vanillaTongue.Release();
-            return;
+            _refirePending = true;
+        }
+        else if (actionPressed && !_customTongue.IsBusy && !_vanillaTongue.IsBusy)
+        {
+            TryFire();
         }
 
-        if (!Config.Enabled.Value || _customTongue.IsBusy || _vanillaTongue.IsBusy ||
-            Time.time < _nextFireTime)
+        if (!_refirePending || _customTongue.IsBusy || _vanillaTongue.IsBusy)
             return;
 
-        bool fired = _mode == TongueMode.Custom
-            ? _customTongue.TryFire()
-            : _vanillaTongue.TryFire();
-        if (fired)
+        _refirePending = false;
+        TryFire();
+    }
+
+    private void TryFire()
+    {
+        if (!Config.Enabled.Value)
+            return;
+
+        ITongueMode activeTongue = _mode == TongueMode.Custom
+            ? _customTongue
+            : _vanillaTongue;
+        bool fired = activeTongue.TryFire();
+        // A miss only plays the tongue animation and does not consume the skill.
+        if (fired && activeTongue.CanRelease)
             _nextFireTime = Time.time + Config.Cooldown.Value;
     }
 

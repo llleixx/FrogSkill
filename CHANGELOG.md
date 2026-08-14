@@ -4,6 +4,12 @@ All notable changes to FrogSkill are documented here.
 
 ## Unreleased
 
+## 1.2.0 - 2026-08-14
+
+- Changed the action key to re-grab toward the current aim direction after releasing an active target.
+- Kept the current pull intact when re-grab is pressed during cooldown.
+- Changed missed shots to play their tongue animation without triggering cooldown.
+
 ## 1.1.1 - 2026-08-14
 
 - Updated the required BepInExPack_PEAK dependency to 5.4.75301.

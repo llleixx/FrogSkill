@@ -12,7 +12,7 @@ internal sealed class ModConfig
             "Controls",
             "ActivationKey",
             KeyCode.G,
-            "Fire or release the tongue.");
+            "Fire the tongue, or re-grab while pulling once cooldown has elapsed.");
         ModeSwitchKey = config.Bind(
             "Controls",
             "ModeSwitchKey",
@@ -40,7 +40,7 @@ internal sealed class ModConfig
         ExtraDragLetGo = BindRange(
             config, "Tongue", "ExtraDragLetGo", 0.1f, 0f, 1f,
             "Velocity retention applied once when releasing. Vanilla FrogTongue default: 0.1.");
-        Cooldown = BindRange(config, "Tongue", "Cooldown", 0.5f, 0f, 60f, "Cooldown between tongue shots.");
+        Cooldown = BindRange(config, "Tongue", "Cooldown", 0.5f, 0f, 60f, "Cooldown after successfully grabbing a target. Misses do not trigger it.");
     }
 
     public ConfigEntry<bool> Enabled { get; }

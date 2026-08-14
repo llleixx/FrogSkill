@@ -38,9 +38,9 @@ Only players who want to fire a tongue need to install FrogSkill. Installation r
 
 Custom mode is selected by default. Press `C` to switch modes; an on-screen notification shows the newly selected mode. Switching does not interrupt an active pull and applies to the next shot.
 
-Aim the center crosshair directly at a living Scout or supported Zombie and press `G` to fire. Press `G` again while pulling to release early. Both keys can be rebound from ModConfig's modded controls page. The modes share one cooldown and cannot pull simultaneously.
+Aim the center crosshair directly at a living Scout or supported Zombie and press `G` to fire. Once the cooldown has elapsed, press `G` again while pulling to release the current target and fire toward the new aim direction. Pressing it during cooldown leaves the current pull untouched. Both keys can be rebound from ModConfig's modded controls page. The modes share one cooldown and cannot pull simultaneously.
 
-If the crosshair does not hit a valid target, the tongue performs a short miss animation. Custom-mode misses are synchronized to modded clients; Vanilla-mode misses are visible only to the firing player. The maximum visual length is 35% of the configured target range and stops early on physical obstructions.
+If the crosshair does not hit a valid target, the tongue performs a short miss animation without triggering the skill cooldown. Custom-mode misses are synchronized to modded clients; Vanilla-mode misses are visible only to the firing player. The maximum visual length is 35% of the configured target range and stops early on physical obstructions.
 
 ### Configuration
 
@@ -106,9 +106,9 @@ FrogSkill 为每个存活的 Scout 添加青蛙舌头，可以抓住并拖拽其
 
 默认选择 Custom 模式。按 `C` 切换模式，屏幕提示会显示新模式。切换不会中断正在进行的拉取，而是从下一次发射开始生效。
 
-用屏幕中心准心直接瞄准存活 Scout 或受支持的 Zombie，按 `G` 发射；拉取期间再次按 `G` 可以提前释放。两个按键都可以在 ModConfig 的 Mod 控制页面中重新绑定。两种模式共用冷却，并且不能同时拉取。
+用屏幕中心准心直接瞄准存活 Scout 或受支持的 Zombie，按 `G` 发射。冷却结束后，在拉取期间再次按 `G` 会释放当前目标，并朝新的瞄准方向重新抓取；冷却期间按下 `G` 不会中断当前拉取，也不会重新抓取。两个按键都可以在 ModConfig 的 Mod 控制页面中重新绑定。两种模式共用冷却，并且不能同时拉取。
 
-未命中有效目标时会播放短促的空吐动画。Custom 模式的空吐会同步给已安装 Mod 的客户端；Vanilla 模式的空吐仅施法者本地可见。空吐的最大视觉长度为配置射程的 35%，遇到物理障碍时会提前停止。
+未命中有效目标时会播放短促的空吐动画，但不会触发技能冷却。Custom 模式的空吐会同步给已安装 Mod 的客户端；Vanilla 模式的空吐仅施法者本地可见。空吐的最大视觉长度为配置射程的 35%，遇到物理障碍时会提前停止。
 
 配置文件位于 `BepInEx/config/com.github.lllei.FrogSkill.cfg`，所有配置键、默认值和范围见上方英文表格。两种模式共用距离、力度、持续时间、停止距离和冷却；`ExtraDragOther` 与 `ExtraDragLetGo` 仅作用于 Custom 模式。
 
