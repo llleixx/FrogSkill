@@ -4,6 +4,10 @@ All notable changes to FrogSkill are documented here.
 
 ## Unreleased
 
+## 1.1.1 - 2026-08-14
+
+- Updated the required BepInExPack_PEAK dependency to 5.4.75301.
+
 ## 1.1.0 - 2026-08-14
 
 - Added a Vanilla tongue mode that uses PEAK's original Frog network object so unmodded clients can see successful hits.
