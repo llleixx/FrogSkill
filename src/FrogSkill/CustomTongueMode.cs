@@ -3,42 +3,36 @@ using UnityEngine;
 
 namespace FrogSkill;
 
-public sealed class ScoutTongue : MonoBehaviour
+public sealed class CustomTongueMode : MonoBehaviour, ITongueMode
 {
+    // These wire names are shared with FrogSkill 1.0 clients and must remain stable.
     private const string FireRpc = nameof(RPCA_FrogSkillFire);
     private const string MissRpc = nameof(RPCA_FrogSkillMiss);
     private const string ReleaseRpc = nameof(RPCA_FrogSkillRelease);
     private const float TongueTravelDuration = 0.25f;
-    private const float MissExtendDuration = 0.12f;
-    private const float MissRetractDuration = 0.12f;
-    private const float MissDistanceRatio = 0.35f;
-    private const float VanillaTargetTurnDuration = 0.5f;
+    private const float FrogTargetTurnDuration = 0.5f;
     private const float NetworkMaxDistance = 65f;
-    private static readonly Vector3 FallbackMouthLocalOffset = new(0f, 0.82f, 0.16f);
-    private static readonly Color TongueColor = new(0.85f, 0.18f, 0.28f, 1f);
 
     private Character _caster = null!;
-    private Renderer? _mouthRenderer;
+    private TongueContext _context = null!;
     private Character? _target;
     private Rigidbody? _targetRig;
     private LineRenderer? _line;
     private Material? _lineMaterial;
     private float _firedAt;
     private float _pullStartedAt;
-    private float _nextFireTime;
     private Vector3 _missEndpoint;
     private bool _missActive;
     private bool _pulling;
 
     private ModConfig Config => Plugin.Instance!.Settings;
+    bool ITongueMode.CanRelease => _target != null;
+    bool ITongueMode.IsBusy => _target != null || _missActive;
 
     private void Awake()
     {
         _caster = GetComponent<Character>();
-        AnimatedMouth? animatedMouth = GetComponent<AnimatedMouth>();
-        _mouthRenderer = animatedMouth != null ? animatedMouth.mouthRenderer : null;
-        if (_mouthRenderer == null && _caster.refs?.customization?.refs != null)
-            _mouthRenderer = _caster.refs.customization.refs.mouthRenderer;
+        _context = new TongueContext(_caster);
         CreateTongueVisual();
     }
 
@@ -48,35 +42,34 @@ public sealed class ScoutTongue : MonoBehaviour
             ReleaseOrClear();
 
         UpdateTongueVisual();
-        if (!_caster.IsLocal || Plugin.Instance == null || !Config.Enabled.Value || !CanReadInput())
-            return;
+    }
 
-        if (!Input.GetKeyDown(Config.ActivationKey.Value))
-            return;
-
-        if (_target != null)
-        {
-            SendRelease();
-            return;
-        }
-
-        if (Time.time < _nextFireTime || !CanCasterAttack() ||
-            !TryGetAim(out Character? target, out Vector3 endpoint))
-            return;
+    bool ITongueMode.TryFire()
+    {
+        if (!_caster.IsLocal || Plugin.Instance == null || !Config.Enabled.Value ||
+            _target != null || _missActive || !_context.CanCasterAttack() ||
+            !_context.TryGetAim(Config.MaxDistance.Value, out Character? target, out Vector3 endpoint))
+            return false;
 
         if (target != null)
         {
-            if (!VanillaFrogDragProfile.TryGet(Plugin.Instance.ModLogger, out _))
-                return;
+            if (!FrogPullProfile.TryGet(Plugin.Instance.ModLogger, out _))
+                return false;
 
-            _nextFireTime = Time.time + Config.Cooldown.Value;
             _caster.photonView.RPC(FireRpc, RpcTarget.All, target.photonView.ViewID);
         }
         else
         {
-            _nextFireTime = Time.time + Config.Cooldown.Value;
             _caster.photonView.RPC(MissRpc, RpcTarget.All, endpoint);
         }
+
+        return true;
+    }
+
+    void ITongueMode.Release()
+    {
+        if (_caster.IsLocal && _target != null)
+            SendRelease();
     }
 
     private void FixedUpdate()
@@ -90,19 +83,19 @@ public sealed class ScoutTongue : MonoBehaviour
             return;
         }
 
-        Vector3 anchor = GetMouthPosition();
+        Vector3 anchor = _context.GetMouthPosition();
         Vector3 delta = anchor - _target.Center;
         float distance = delta.magnitude;
-        if (!VanillaFrogDragProfile.TryGet(Plugin.Instance.ModLogger, out VanillaFrogDragProfile vanilla))
+        if (!FrogPullProfile.TryGet(Plugin.Instance.ModLogger, out FrogPullProfile pullProfile))
         {
             ReleaseOrClear();
             return;
         }
 
         Vector3 direction = distance > 0.001f ? delta / distance : Vector3.zero;
-        float curveMultiplier = vanilla.PullStrengthCurve.Evaluate(distance);
+        float curveMultiplier = pullProfile.PullStrengthCurve.Evaluate(distance);
         Vector3 pull = direction * Config.PullForce.Value * curveMultiplier;
-        Vector3 lift = Vector3.up * Mathf.Clamp(delta.y, 0f, vanilla.MaxLiftDistance) *
+        Vector3 lift = Vector3.up * Mathf.Clamp(delta.y, 0f, pullProfile.MaxLiftDistance) *
                        Config.LiftForce.Value;
 
         _target.refs.movement.ApplyExtraDrag(Config.ExtraDragOther.Value, ignoreRagdoll: true);
@@ -116,7 +109,7 @@ public sealed class ScoutTongue : MonoBehaviour
         // Vanilla applies the current physics frame's force before testing whether to let go.
         float effectivePullDuration = Mathf.Max(
             Time.fixedDeltaTime,
-            Config.MaxHookDuration.Value - VanillaTargetTurnDuration);
+            Config.MaxHookDuration.Value - FrogTargetTurnDuration);
         if (Vector3.Distance(anchor, _targetRig.position) < Config.StopDistance.Value ||
             Time.time - _pullStartedAt > effectivePullDuration)
         {
@@ -132,8 +125,8 @@ public sealed class ScoutTongue : MonoBehaviour
 
         PhotonView targetView = PhotonView.Find(targetViewId);
         Character? target = targetView == null ? null : targetView.GetComponent<Character>();
-        if (!IsPermittedTarget(target) || Plugin.Instance == null ||
-            !VanillaFrogDragProfile.TryGet(Plugin.Instance.ModLogger, out _))
+        if (!_context.IsPermittedTarget(target) || Plugin.Instance == null ||
+            !FrogPullProfile.TryGet(Plugin.Instance.ModLogger, out _))
             return;
 
         if (Vector3.Distance(_caster.Center, target!.Center) > NetworkMaxDistance)
@@ -167,76 +160,9 @@ public sealed class ScoutTongue : MonoBehaviour
             ClearTarget();
     }
 
-    private bool TryGetAim(out Character? target, out Vector3 endpoint)
-    {
-        target = null;
-        endpoint = default;
-        Camera camera = MainCamera.instance != null
-            ? MainCamera.instance.GetComponent<Camera>()
-            : Camera.main;
-        if (camera == null)
-            return false;
-
-        Ray aimRay = camera.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f));
-        float missDistance = Config.MaxDistance.Value * MissDistanceRatio;
-        endpoint = aimRay.GetPoint(missDistance);
-        RaycastHit[] hits = Physics.RaycastAll(
-            aimRay,
-            Config.MaxDistance.Value,
-            HelperFunctions.GetMask(HelperFunctions.LayerType.AllPhysicalExceptDefault));
-        RaycastHit nearestHit = default;
-        float nearestDistance = float.MaxValue;
-
-        foreach (RaycastHit hit in hits)
-        {
-            if (hit.collider == null || hit.distance >= nearestDistance)
-                continue;
-
-            CharacterRagdoll.TryGetCharacterFromCollider(hit.collider, out Character hitCharacter);
-            if (hitCharacter == _caster)
-                continue;
-
-            nearestDistance = hit.distance;
-            nearestHit = hit;
-        }
-
-        if (nearestHit.collider != null && nearestHit.distance < missDistance)
-            endpoint = nearestHit.point;
-
-        if (nearestHit.collider == null ||
-            !CharacterRagdoll.TryGetCharacterFromCollider(nearestHit.collider, out Character hitTarget) ||
-            !IsPermittedTarget(hitTarget))
-            return true;
-
-        target = hitTarget;
-        return true;
-    }
-
     private bool IsValidActiveTarget()
     {
-        return IsPermittedTarget(_target) && _targetRig != null && !_caster.data.dead;
-    }
-
-    private bool IsPermittedTarget(Character? target)
-    {
-        if (target == null || target == _caster)
-            return false;
-
-        bool supportedType = target.isZombie || (!target.isBot && !target.isScoutmaster);
-        return supportedType && target.data != null && !target.data.dead &&
-               !target.data.fullyPassedOut && target.refs?.ragdoll != null &&
-               target.refs.ragdoll.partDict.ContainsKey(BodypartType.Torso);
-    }
-
-    private bool CanCasterAttack()
-    {
-        return _caster.data != null && !_caster.data.dead && !_caster.data.fullyPassedOut && !_caster.warping;
-    }
-
-    private static bool CanReadInput()
-    {
-        return Time.timeScale > 0f && GUIManager.instance != null &&
-               !GUIManager.instance.windowBlockingInput && !GUIManager.instance.wheelActive;
+        return _context.IsPermittedTarget(_target) && _targetRig != null && !_caster.data.dead;
     }
 
     private bool IsOwnerMessage(Photon.Realtime.Player sender)
@@ -281,34 +207,9 @@ public sealed class ScoutTongue : MonoBehaviour
             _line.enabled = false;
     }
 
-    private Vector3 GetMouthPosition()
-    {
-        if (_mouthRenderer != null)
-            return _mouthRenderer.bounds.center;
-
-        Transform head = _caster.refs.head.transform;
-        return head.TransformPoint(FallbackMouthLocalOffset);
-    }
-
     private void CreateTongueVisual()
     {
-        GameObject visual = new("FrogSkill Tongue");
-        visual.transform.SetParent(transform, false);
-        _line = visual.AddComponent<LineRenderer>();
-        _line.useWorldSpace = true;
-        _line.positionCount = 2;
-        _line.startWidth = 0.075f;
-        _line.endWidth = 0.035f;
-        _line.numCapVertices = 4;
-        Shader shader = Shader.Find("Sprites/Default");
-        if (shader != null)
-        {
-            _lineMaterial = new Material(shader);
-            _line.material = _lineMaterial;
-        }
-        _line.startColor = TongueColor;
-        _line.endColor = TongueColor;
-        _line.enabled = false;
+        _line = TongueVisual.CreateLine(transform, "FrogSkill Custom Tongue", out _lineMaterial);
     }
 
     private void UpdateTongueVisual()
@@ -316,16 +217,10 @@ public sealed class ScoutTongue : MonoBehaviour
         if (_line == null || !_line.enabled)
             return;
 
-        Vector3 mouth = GetMouthPosition();
+        Vector3 mouth = _context.GetMouthPosition();
         if (_missActive)
         {
-            float elapsed = Time.time - _firedAt;
-            float missExtension = Mathf.Clamp01(elapsed / MissExtendDuration);
-            float retraction = Mathf.Clamp01((elapsed - MissExtendDuration) / MissRetractDuration);
-            _line.SetPosition(0, mouth);
-            _line.SetPosition(1, Vector3.Lerp(mouth, _missEndpoint, missExtension * (1f - retraction)));
-
-            if (retraction >= 1f)
+            if (TongueVisual.UpdateMiss(_line, _firedAt, mouth, _missEndpoint))
                 ClearMiss();
             return;
         }
@@ -348,7 +243,7 @@ public sealed class ScoutTongue : MonoBehaviour
 
         _pulling = true;
         _pullStartedAt = Time.time;
-        Vector3 towardCaster = GetMouthPosition() - _target.Center;
+        Vector3 towardCaster = _context.GetMouthPosition() - _target.Center;
         towardCaster.y = 0f;
         if (towardCaster.sqrMagnitude > 0.0001f)
             _target.data.lookValues = DirectionToLook(towardCaster.normalized);

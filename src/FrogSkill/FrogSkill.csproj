@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>FrogSkill</AssemblyName>
     <RootNamespace>FrogSkill</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <ThunderstoreAuthor>lllei</ThunderstoreAuthor>
     <ThunderstorePackageName>FrogSkill</ThunderstorePackageName>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -24,6 +24,9 @@
     <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedDir)\UnityEngine.CoreModule.dll" Private="false" />
     <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(ManagedDir)\UnityEngine.InputLegacyModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ManagedDir)\UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(ManagedDir)\UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UI" HintPath="$(ManagedDir)\UnityEngine.UI.dll" Private="false" />
+    <Reference Include="Unity.TextMeshPro" HintPath="$(ManagedDir)\Unity.TextMeshPro.dll" Private="false" />
     <Reference Include="PhotonUnityNetworking" HintPath="$(ManagedDir)\PhotonUnityNetworking.dll" Private="false" />
     <Reference Include="PhotonRealtime" HintPath="$(ManagedDir)\PhotonRealtime.dll" Private="false" />
   </ItemGroup>

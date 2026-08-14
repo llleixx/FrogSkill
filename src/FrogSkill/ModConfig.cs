@@ -13,6 +13,11 @@ internal sealed class ModConfig
             "ActivationKey",
             KeyCode.G,
             "Fire or release the tongue.");
+        ModeSwitchKey = config.Bind(
+            "Controls",
+            "ModeSwitchKey",
+            KeyCode.C,
+            "Switch between Custom and Vanilla tongue modes for the next shot.");
 
         MaxDistance = BindRange(
             config, "Tongue", "MaxDistance", 40f, 5f, 60f,
@@ -40,6 +45,7 @@ internal sealed class ModConfig
 
     public ConfigEntry<bool> Enabled { get; }
     public ConfigEntry<KeyCode> ActivationKey { get; }
+    public ConfigEntry<KeyCode> ModeSwitchKey { get; }
     public ConfigEntry<float> MaxDistance { get; }
     public ConfigEntry<float> PullForce { get; }
     public ConfigEntry<float> LiftForce { get; }

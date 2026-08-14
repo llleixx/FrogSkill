@@ -4,6 +4,14 @@ All notable changes to FrogSkill are documented here.
 
 ## Unreleased
 
+## 1.1.0 - 2026-08-14
+
+- Added a Vanilla tongue mode that uses PEAK's original Frog network object so unmodded clients can see successful hits.
+- Added a `C` mode switch while keeping `G` as the shared fire and release key.
+- Added shared cooldown and active-tongue coordination between both modes.
+- Kept Custom mode as the default and preserved the original FrogSkill configuration.
+- Marked the standalone FrogSkillVanilla plugin as incompatible to prevent duplicate controls.
+
 ## 1.0.0 - 2026-08-13
 
 - Added a configurable frog-tongue skill for living Scouts.

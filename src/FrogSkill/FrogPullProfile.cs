@@ -3,15 +3,15 @@ using UnityEngine;
 
 namespace FrogSkill;
 
-internal sealed class VanillaFrogDragProfile
+internal sealed class FrogPullProfile
 {
     private const float RetryInterval = 5f;
 
-    private static VanillaFrogDragProfile? _cached;
+    private static FrogPullProfile? _cached;
     private static float _nextSearchTime;
     private static bool _missingLogged;
 
-    private VanillaFrogDragProfile(FrogTongue source)
+    private FrogPullProfile(FrogTongue source)
     {
         PullStrengthCurve = CloneCurve(source.pullStrengthCurve);
         MaxLiftDistance = source.maxLiftDistance;
@@ -20,7 +20,7 @@ internal sealed class VanillaFrogDragProfile
     public AnimationCurve PullStrengthCurve { get; }
     public float MaxLiftDistance { get; }
 
-    public static bool TryGet(ManualLogSource logger, out VanillaFrogDragProfile profile)
+    public static bool TryGet(ManualLogSource logger, out FrogPullProfile profile)
     {
         if (_cached != null)
         {
@@ -40,7 +40,7 @@ internal sealed class VanillaFrogDragProfile
             if (frog == null || frog.pullStrengthCurve == null || frog.pullStrengthCurve.length == 0)
                 continue;
 
-            _cached = new VanillaFrogDragProfile(frog);
+            _cached = new FrogPullProfile(frog);
             _missingLogged = false;
             logger.LogInfo(
                 $"Captured vanilla FrogTongue drag profile from {frog.gameObject.name}: " +
