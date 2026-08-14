@@ -34,8 +34,6 @@ Only players who want to fire a tongue need to install FrogSkill. Installation r
 | Custom | Clients without FrogSkill cannot see the custom tongue |
 | Vanilla | Unmodded clients can see successful tongue hits; the temporary Frog model may occasionally clip through the Scout |
 
-Do not install the standalone FrogSkillVanilla plugin together with FrogSkill. The combined mod already includes Vanilla mode and marks the standalone plugin as incompatible.
-
 ### Controls
 
 Custom mode is selected by default. Press `C` to switch modes; an on-screen notification shows the newly selected mode. Switching does not interrupt an active pull and applies to the next shot.
@@ -103,8 +101,6 @@ FrogSkill 为每个存活的 Scout 添加青蛙舌头，可以抓住并拖拽其
 |---|---|
 | Custom | 未安装 FrogSkill 的客户端看不到自定义舌头 |
 | Vanilla | 未安装 Mod 的客户端也能看到成功命中的舌头；临时青蛙模型偶尔可能从 Scout 身体中穿出 |
-
-请勿同时安装独立的 FrogSkillVanilla。当前 FrogSkill 已包含 Vanilla 模式，并会将独立插件标记为不兼容。
 
 ### 操作
 
