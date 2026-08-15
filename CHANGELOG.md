@@ -4,6 +4,11 @@ All notable changes to FrogSkill are documented here.
 
 ## Unreleased
 
+## 1.3.0 - 2026-08-15
+
+- Added configurable crosshair forgiveness for near-miss tongue shots, shared by Custom and Vanilla modes, with a 3-degree default and a range up to 10 degrees.
+- Kept direct crosshair hits as the highest priority and required assisted targets to have an unobstructed line of sight.
+
 ## 1.2.0 - 2026-08-14
 
 - Changed the action key to re-grab toward the current aim direction after releasing an active target.

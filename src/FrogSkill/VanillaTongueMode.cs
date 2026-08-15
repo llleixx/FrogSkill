@@ -55,7 +55,11 @@ internal sealed class VanillaTongueMode : MonoBehaviour, ITongueMode
     {
         if (!_caster.IsLocal || Plugin.Instance == null || !Config.Enabled.Value ||
             _proxy != null || _missActive || !_context.CanCasterAttack() ||
-            !_context.TryGetAim(Config.MaxDistance.Value, out Character? target, out Vector3 endpoint))
+            !_context.TryGetAim(
+                Config.MaxDistance.Value,
+                Config.AimForgivenessDegrees.Value,
+                out Character? target,
+                out Vector3 endpoint))
             return false;
 
         if (target != null)

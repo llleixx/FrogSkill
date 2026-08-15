@@ -22,6 +22,9 @@ internal sealed class ModConfig
         MaxDistance = BindRange(
             config, "Tongue", "MaxDistance", 40f, 5f, 60f,
             "Maximum target distance in meters. Vanilla FrogTongue default: 40.");
+        AimForgivenessDegrees = BindRange(
+            config, "Tongue", "AimForgivenessDegrees", 3f, 0f, 10f,
+            "Aim-assist cone half-angle in degrees. Direct crosshair hits always take priority; set to 0 for strict targeting.");
         PullForce = BindRange(
             config, "Tongue", "PullForce", 450f, 0f, 2000f,
             "Directional pull acceleration before the vanilla distance curve. Current Frog prefab default: 450.");
@@ -47,6 +50,7 @@ internal sealed class ModConfig
     public ConfigEntry<KeyCode> ActivationKey { get; }
     public ConfigEntry<KeyCode> ModeSwitchKey { get; }
     public ConfigEntry<float> MaxDistance { get; }
+    public ConfigEntry<float> AimForgivenessDegrees { get; }
     public ConfigEntry<float> PullForce { get; }
     public ConfigEntry<float> LiftForce { get; }
     public ConfigEntry<float> MaxHookDuration { get; }

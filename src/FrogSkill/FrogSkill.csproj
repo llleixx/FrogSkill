@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>FrogSkill</AssemblyName>
     <RootNamespace>FrogSkill</RootNamespace>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
     <ThunderstoreAuthor>lllei</ThunderstoreAuthor>
     <ThunderstorePackageName>FrogSkill</ThunderstorePackageName>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
