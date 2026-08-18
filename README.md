@@ -1,5 +1,8 @@
 # FrogSkill
 
+[![GitHub Repo](https://img.shields.io/badge/GitHub-llleixx%2FFrogSkill-black?logo=github)](https://github.com/llleixx/FrogSkill)
+[![Thunderstore Downloads](https://img.shields.io/thunderstore/dt/lllei/FrogSkill?logo=thunderstore&label=Downloads)](https://thunderstore.io/c/peak/p/lllei/FrogSkill/)
+
 [English](#english) | [中文](#中文)
 
 **Custom mode / Custom 模式**
